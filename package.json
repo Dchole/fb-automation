@@ -1,0 +1,21 @@
+{
+  "name": "fb-automation",
+  "version": "1.0.0",
+  "description": "Scripting with `puppeteer`. Automating Facebook like and comment",
+  "main": "index.js",
+  "scripts": {
+    "start": "node -r esm src/index.js",
+    "dev": "nodemon -r esm src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "dotenv-flow": "^3.2.0",
+    "puppeteer": "^11.0.0"
+  }
+}
