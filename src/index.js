@@ -46,8 +46,9 @@ const href = "https://web.facebook.com"
       ])
 
       if ((author || refAuthor) && !adLink) {
-        await post.$('div[aria-label="Like"]')
-        // .then(likeButton => likeButton && likeButton.click())
+        await post
+          .$('div[aria-label="Like"]')
+          .then(likeButton => likeButton && likeButton.click())
 
         await post
           .$('div[aria-label="Leave a comment"]')
@@ -59,7 +60,7 @@ const href = "https://web.facebook.com"
           )
           .then(commentInput => {
             commentInput.type("Hi").then(() => {
-              // page.keyboard.press("Enter")
+              page.keyboard.press("Enter")
             })
           })
       }
