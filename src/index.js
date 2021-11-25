@@ -2,7 +2,20 @@ import { config } from "dotenv-flow"
 import puppeteer from "puppeteer"
 
 config()
+
 const href = "https://web.facebook.com"
+
+/**
+ * Replace `undefined` with the link to your page
+ * If you wish to run script on the Feed, leave the `undefined`
+ *
+ * @type {string}
+ * @example
+ * const fbPage = "https://web.facebook.com/Derek-Oware-104213128257975"; // Run automation on my Facebook page
+ * or
+ * const fbPage = undefined; // Run automation on Facebook news feed
+ */
+const fbPage = undefined
 
 ;(async () => {
   try {
@@ -11,6 +24,7 @@ const href = "https://web.facebook.com"
       headless: false,
       defaultViewport: null
     })
+
     const page = await browser.newPage()
     page.setDefaultNavigationTimeout(0)
     page.setDefaultTimeout(0)
@@ -22,11 +36,18 @@ const href = "https://web.facebook.com"
       .waitForSelector("#email")
       .then(usernameField => usernameField.type(process.env.EMAIL_OR_PHONE))
     await page.type("#pass", process.env.PASSWORD)
-    await page.click("button[type='submit']")
+    await page.click('button[type="submit"]')
 
-    // Feed
     await page.waitForNavigation({ waitUntil: "load" })
-    await page.waitForSelector("div[role='feed'")
+
+    if (fbPage) {
+      // Page
+      await page.goto(fbPage)
+      await page.waitForSelector('div[role="main"]')
+    } else {
+      // Feed
+      await page.waitForSelector('div[role="feed"')
+    }
 
     let scroll = true
     let postCount = 1
@@ -39,13 +60,14 @@ const href = "https://web.facebook.com"
       const { height } = await post.boundingBox()
       await page.mouse.wheel({ deltaY: height })
 
-      const [author, refAuthor, adLink] = await Promise.all([
+      const [pageAuthor, feedAuthor, refAuthor, adLink] = await Promise.all([
+        post.$("h3"),
         post.$("h4"),
         post.$("h5"),
         post.$('a[aria-label="Sponsored"]')
       ])
 
-      if ((author || refAuthor) && !adLink) {
+      if ((feedAuthor || pageAuthor || refAuthor) && !adLink) {
         await post
           .$('div[aria-label="Like"]')
           .then(likeButton => likeButton && likeButton.click())
