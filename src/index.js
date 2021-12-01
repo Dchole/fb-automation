@@ -38,7 +38,7 @@ const fbPage = undefined
     await page.type("#pass", process.env.PASSWORD)
     await page.click('button[type="submit"]')
 
-    await page.waitForNavigation({ waitUntil: "load" })
+    await page.waitForNavigation({ waitUntil: "networkidle2" })
 
     if (fbPage) {
       // Page
@@ -60,17 +60,18 @@ const fbPage = undefined
       const { height } = await post.boundingBox()
       await page.mouse.wheel({ deltaY: height })
 
-      const [pageAuthor, feedAuthor, refAuthor, adLink] = await Promise.all([
-        post.$("h3"),
-        post.$("h4"),
-        post.$("h5"),
-        post.$('a[aria-label="Sponsored"]')
-      ])
+      const [pageAuthor, feedAuthor, refAuthor, adLink, removeLike] =
+        await Promise.all([
+          post.$("h3"),
+          post.$("h4"),
+          post.$("h5"),
+          post.$('a[aria-label="Sponsored"]'),
+          post.$('div[aria-label="Remove Like"]')
+        ])
 
-      if ((feedAuthor || pageAuthor || refAuthor) && !adLink) {
-        await post
-          .$('div[aria-label="Like"]')
-          .then(likeButton => likeButton && likeButton.click())
+      if ((feedAuthor || pageAuthor || refAuthor) && !adLink && !removeLike) {
+        await post.$('div[aria-label="Like"]')
+        // .then(likeButton => likeButton && likeButton.click())
 
         await post
           .$('div[aria-label="Leave a comment"]')
@@ -82,10 +83,12 @@ const fbPage = undefined
           )
           .then(commentInput => {
             commentInput.type("Hi").then(() => {
-              page.keyboard.press("Enter")
+              // page.keyboard.press("Enter")
             })
           })
       }
+
+      await page.waitForTimeout(10_000) // wait for "10" seconds before moving to next post
 
       postCount++
 
