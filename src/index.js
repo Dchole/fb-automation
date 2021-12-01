@@ -70,8 +70,9 @@ const fbPage = undefined
         ])
 
       if ((feedAuthor || pageAuthor || refAuthor) && !adLink && !removeLike) {
-        await post.$('div[aria-label="Like"]')
-        // .then(likeButton => likeButton && likeButton.click())
+        await post
+          .$('div[aria-label="Like"]')
+          .then(likeButton => likeButton && likeButton.click())
 
         await post
           .$('div[aria-label="Leave a comment"]')
@@ -83,7 +84,7 @@ const fbPage = undefined
           )
           .then(commentInput => {
             commentInput.type("Hi").then(() => {
-              // page.keyboard.press("Enter")
+              page.keyboard.press("Enter")
             })
           })
       }
